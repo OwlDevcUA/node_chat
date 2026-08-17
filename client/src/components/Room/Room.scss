@@ -1,0 +1,95 @@
+.room-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  color: #333333;
+  background-color: transparent;
+  transition: background-color 0.15s ease;
+  cursor: pointer;
+  min-width: 0;
+
+  &:hover {
+    background-color: #f0f0f0;
+
+    .room-item__actions {
+      opacity: 1;
+    }
+  }
+
+  &--active {
+    background-color: #e6f0ff;
+    color: #0066cc;
+    font-weight: 500;
+  }
+
+  &__title {
+    flex-grow: 1;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    &--editable {
+      cursor: text;
+    }
+  }
+
+  &__rename-form {
+    flex-grow: 1;
+    display: flex;
+    min-width: 0;
+  }
+
+  &__rename-input {
+    width: 100%;
+    font-size: 14px;
+    font-family: inherit;
+    padding: 2px 6px;
+    border: 1px solid #0066cc;
+    border-radius: 4px;
+    outline: none;
+    background-color: #ffffff;
+    color: #333333;
+  }
+
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  &__btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    line-height: 1;
+    transition: background-color 0.12s ease, color 0.12s ease;
+
+    &--join {
+      background-color: #0066cc;
+      color: #ffffff;
+
+      &:hover {
+        background-color: #0052a3;
+      }
+    }
+
+    &--delete {
+      color: #888888;
+
+      &:hover {
+        background-color: rgba(255, 0, 0, 0.1);
+        color: #d93025;
+      }
+    }
+  }
+}
