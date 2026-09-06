@@ -1,4 +1,4 @@
-import { useState } from "react"
+import React, { useState } from "react"
 import './Username.scss';
 import { saveUser } from "../../services/userApi";
 import type { User } from "../../types/User";
@@ -26,7 +26,7 @@ export const UsernameForm: React.FC<Props> = ({ onSet }) => {
 
   return (
     <form className="usernameForm" onSubmit={handleSubmit}>
-      <p className="usernameForm__lable">Enter the username:</p>
+      <p className="usernameForm__label">Enter the username:</p>
       <input
         className="usernameForm__input"
         type="text"

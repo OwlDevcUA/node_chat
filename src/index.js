@@ -49,7 +49,7 @@ UserRooms.belongsTo(Room, { foreignKey: 'roomId' });
 
 const startApp = async () => {
   try {
-    await sequelize.sync({ force: true });
+    await sequelize.sync();
 
     const server = app.listen(PORT);
 

@@ -1,6 +1,6 @@
 import type React from "react";
 import { useState } from "react";
-import { getMessages, getRoomMessages, postMessage, postRooomMessage } from "../../services/messageApi";
+import { getMessages, getRoomMessages, postMessage, postRoomMessage } from "../../services/messageApi";
 import './MessageForm.scss'
 import type { Message } from "../../types/Message";
 
@@ -36,7 +36,7 @@ export const MessageForm: React.FC<Props> = ({ username, roomId, userId, setMess
     }
 
     if (roomId) {
-      await postRooomMessage(username, text.trim(), roomId, userId);
+      await postRoomMessage(username, text.trim(), roomId, userId);
     } else {
       await postMessage(username, text.trim(), userId);
     }

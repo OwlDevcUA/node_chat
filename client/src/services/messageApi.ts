@@ -15,7 +15,7 @@ export async function postMessage(username: string, text: string, userId: string
   return response.data;
 }
 
-export async function postRooomMessage(
+export async function postRoomMessage(
   username: string,
    text: string,
    roomId: string,

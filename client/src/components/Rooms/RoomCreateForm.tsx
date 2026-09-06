@@ -1,4 +1,4 @@
-import { useState } from "react"
+import React, { useState } from "react"
 import { createRoom } from "../../services/roomApi";
 import type { Room } from "../../types/Room";
 
@@ -25,7 +25,7 @@ export const RoomCreateForm: React.FC<Props> = ({ userId, onSet, onClose }) => {
 
   return (
     <form className="createRoom" onSubmit={handleSubmit}>
-      <p className="createRoom__lable">Enter the name:</p>
+      <p className="createRoom__label">Enter the name:</p>
       <input
         className="createRoom__input"
         type="text"
