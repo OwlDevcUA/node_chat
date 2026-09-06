@@ -1,58 +1,56 @@
-.message-form {
+.messageForm {
   display: flex;
-  gap: 10px;
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto; /* Центрируем форму так же, как и чат */
-  padding: 10px;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
   background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-top: 1px solid #e5e7eb;
+  width: 100%;
   box-sizing: border-box;
 
   &__input {
-    flex: 1; /* Инпут занимает всё доступное пространство */
-    padding: 12px 16px;
+    flex: 1;
+    height: 48px;
+    padding: 0 16px;
+    background-color: #ffffff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
     font-size: 0.95rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
+    color: #1f2937;
     outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-
-    &:focus {
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    }
+    transition: all 0.2s ease;
 
     &::placeholder {
-      color: #94a3b8;
+      color: #9ca3af;
     }
 
-    &:disabled {
-      background-color: #f1f5f9;
-      cursor: not-allowed;
+    &:focus {
+      border-color: #5542f6;
+      box-shadow: 0 0 0 3px rgba(85, 66, 246, 0.1);
     }
   }
 
-  &__button {
-    padding: 12px 24px;
+  &__send {
+    height: 48px;
+    padding: 0 24px;
+    background-color: #5542f6;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
     font-size: 0.95rem;
     font-weight: 600;
-    color: #ffffff;
-    background-color: #2563eb;
-    border: none;
-    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.2s, opacity 0.2s;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    &:hover:not(:disabled) {
-      background-color: #1d4ed8;
+    &:hover {
+      background-color: #4232d6;
     }
 
-    &:disabled {
-      background-color: #94a3b8;
-      cursor: not-allowed;
-      opacity: 0.7;
+    &:active {
+      transform: scale(0.98);
     }
   }
 }

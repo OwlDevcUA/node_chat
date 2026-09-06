@@ -1,27 +1,38 @@
-import axios from 'axios';
+import { api } from "./axios";
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
-});
-
-export function getRooms() {
-  return api.get('/rooms');
+export async function getRooms() {
+  const response = await api.get('rooms')
+  return response.data;
 }
 
-export function createRoom( name: string, username: string ) {
-  return api.post('/rooms', { name, username })
+export async function createRoom(name: string, userId: string) {
+  const response = await api.post('/rooms', { name, userId })
+  return response.data;
 }
 
-export function renameRoom(roomId: string, name: string) {
-  return api.patch(`/rooms/${roomId}`, { name });
+export async function renameRoom(newName: string, roomId: string) {
+  const response = await api.patch(`/rooms`, { newName, roomId })
+  return response.data;
 }
 
-
-export function deleteRoom(roomId: string) {
-  return api.delete(`/rooms/${roomId}`);
+export async function joinRoom(userId: string, roomId: string) {
+  const response = await api.patch(`/rooms/join`, { userId, roomId })
+  return response.data;
 }
 
-
-export function joinRoom(roomId: string, username: string) {
-  return api.post(`/rooms/${roomId}/join`, { username });
+export async function deleteRoom(roomId: string) {
+  const response = await api.delete('/rooms', { data: { roomId }})
+  return response.data;
 }
+
+export async function leaveRoom(userId: string, roomId: string) {
+  const response = await api.patch('/rooms/leave', { userId, roomId })
+  return response.data;
+}
+
+export async function checkUser(userId: string, roomId: string) {
+  const response = await api.get(`/rooms/${roomId}/users/${userId}`)
+
+  return response.data.isInRoom
+}
+

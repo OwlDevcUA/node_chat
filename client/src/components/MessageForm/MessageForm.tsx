@@ -1,51 +1,60 @@
-import React, { useState } from 'react';
-import { sendMessage } from '../../services/messagesApi';
+import type React from "react";
+import { useState } from "react";
+import { getMessages, getRoomMessages, postMessage, postRooomMessage } from "../../services/messageApi";
 import './MessageForm.scss'
+import type { Message } from "../../types/Message";
 
 type Props = {
-  username: string,
-  roomId?: string,
-};
+  username: string;
+  roomId?: string
+  userId: string;
+  setMessages: (messages: Message[]) => void;
+}
 
-export const MessageForm: React.FC<Props> = ({ username, roomId }) => {
+export const MessageForm: React.FC<Props> = ({ username, roomId, userId, setMessages }) => {
   const [text, setText] = useState('');
-  const [isSending, setIsSending] = useState(false);
 
+  async function loadMessages() {
+        setMessages([]);
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+        if (roomId) {
+        const loadedMessages = await getRoomMessages(roomId);
 
+        setMessages(loadedMessages);
+      } else {
+        const loadedMessages = await getMessages();
 
-    if (!text.trim() || isSending) return;
+        setMessages(loadedMessages);
+      }
+      }
 
-    try {
-      setIsSending(true);
-      await sendMessage(text, username, roomId);
-      setText('');
-    } catch (error) {
-      console.error('Error', error);
-    } finally {
-      setIsSending(false);
+  const handleSend = async (e: React.SubmitEvent) => {
+    e.preventDefault();
+
+    if (!text.trim() || !username) {
+      return;
     }
-  };
+
+    if (roomId) {
+      await postRooomMessage(username, text.trim(), roomId, userId);
+    } else {
+      await postMessage(username, text.trim(), userId);
+    }
+
+    loadMessages();
+    setText('');
+  }
 
   return (
-    <form className="message-form" onSubmit={handleSubmit}>
+    <form className="messageForm" onSubmit={handleSend}>
       <input
         type="text"
-        className="message-form__input"
         placeholder="Type a message..."
+        className="messageForm__input"
         value={text}
-        disabled={isSending}
-        onChange={(event) => setText(event.target.value)}
+        onChange={(e) => setText(e.target.value)}
       />
-      <button
-        type="submit"
-        className="message-form__button"
-        disabled={!text.trim() || isSending}
-      >
-        {isSending ? 'Sending...' : 'Send'}
-      </button>
+      <button className="messageForm__send" type="submit">Send</button>
     </form>
-  );
-};
+  )
+}

@@ -1,24 +1,24 @@
-import { messages } from '../controllers/messageController.js';
+import { Message } from '../modules/Message.js';
 
-function normalize({ username, time, text }) {
-  return { username, time, text };
+async function getMessages(roomId) {
+  return Message.findAll({
+    where: { roomId: roomId || null },
+  });
 }
 
-function addMessage(username, text, roomId) {
-  const message = {
-    username: username,
+async function addMessage(username, text, roomId, userId) {
+  const message = await Message.create({
+    username,
     time: new Date().toISOString(),
-    id: crypto.randomUUID(),
-    text: text,
-    ...(roomId && { roomId }),
-  };
-
-  messages.push(message);
+    text,
+    roomId: roomId || null,
+    userId,
+  });
 
   return message;
 }
 
 export const messageService = {
-  normalize,
+  getMessages,
   addMessage,
 };

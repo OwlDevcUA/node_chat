@@ -1,48 +1,69 @@
-function createRoom(name, username) {
-  const room = {
-    name: name,
-    id: crypto.randomUUID(),
-    users: [username],
-  };
+import { Room } from '../modules/Room.js';
+import { UserRooms } from '../modules/UserRooms.js';
 
-  return room;
+function getAllRooms() {
+  return Room.findAll();
 }
 
-function findById(id, rooms) {
-  return rooms.find((r) => r.id === id) || null;
+function getRoomById(id) {
+  return Room.findOne({
+    where: { id },
+  });
 }
 
-function renameRoom(room, newName) {
-  const updatedRoom = {
-    ...room,
+async function renameRoom(newName, room) {
+  room.set({
     name: newName,
-  };
+  });
 
-  return updatedRoom;
-}
-
-function deleteRoom(id, rooms) {
-  return rooms.filter((r) => r.id !== id);
-}
-
-function joinRoom(id, username, rooms) {
-  const room = findById(id, rooms);
-
-  if (!room) {
-    return null;
-  }
-
-  if (!room.users.includes(username)) {
-    room.users.push(username);
-  }
+  await room.save();
 
   return room;
+}
+
+async function joinRoom(userId, roomId) {
+  const [membership] = await UserRooms.findOrCreate({
+    where: { userId, roomId },
+  });
+
+  return membership;
+}
+
+async function isUserInRoom(userId, roomId) {
+  const membership = await UserRooms.findOne({
+    where: { userId, roomId },
+  });
+
+  return Boolean(membership);
+}
+
+async function addRoom(name, userId) {
+  const room = await Room.create({ name });
+
+  await joinRoom(userId, room.id);
+
+  return room;
+}
+
+async function deleteRoom(roomId) {
+  return Room.destroy({
+    where: { id: roomId },
+  });
+}
+
+async function leaveRoom(userId, roomId) {
+  return UserRooms.destroy({
+    where: { userId, roomId },
+  });
 }
 
 export const roomService = {
-  createRoom,
-  findById,
+  getAllRooms,
+  getRoomById,
+  addRoom,
   renameRoom,
-  deleteRoom,
   joinRoom,
+  deleteRoom,
+  leaveRoom,
+  isUserInRoom,
 };

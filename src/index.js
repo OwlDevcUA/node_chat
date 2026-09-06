@@ -1,12 +1,20 @@
+/* eslint-disable no-console */
 'use strict';
+import 'dotenv/config'; // Оставляем первой строкой!
 import express from 'express';
 import cors from 'cors';
-import 'dotenv/config';
-import { messagesRouter } from './routes/messagesRouter.js';
-import { profileRouter } from './routes/profileRouter.js';
-import { WebSocketServer, WebSocket } from 'ws';
-import { messageEmitter } from './controllers/messageController.js';
-import { roomsRouter } from './routes/roomsRouter.js';
+import { WebSocketServer } from 'ws';
+import { EventEmitter } from 'node:events';
+
+import { sequelize } from './utils/db.js';
+import { Room } from './modules/Room.js';
+import { Message } from './modules/Message.js';
+import { User } from './modules/User.js';
+import { UserRooms } from './modules/UserRooms.js';
+
+import { messageRouter } from './routers/messageRouter.js';
+import { roomRouter } from './routers/roomRouter.js';
+import { userRouter } from './routers/userRouter.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -19,39 +27,67 @@ app.use(
 );
 
 app.use(express.json());
-app.use(messagesRouter);
-app.use(profileRouter);
-app.use(roomsRouter);
+app.use(messageRouter);
+app.use(roomRouter);
+app.use(userRouter);
 
-const server = app.listen(PORT);
-const wss = new WebSocketServer({ server });
+Room.hasMany(Message, {
+  foreignKey: 'roomId',
+  onDelete: 'CASCADE',
+  as: 'messages',
+});
+Message.belongsTo(Room, { foreignKey: 'roomId' });
 
-messageEmitter.on('message', (data) => {
-  for (const client of wss.clients) {
-    if (client.readyState === WebSocket.OPEN) {
-      if (!data.roomId || client.roomId === data.roomId) {
-        client.send(JSON.stringify(data));
+User.hasMany(Message, { foreignKey: 'userId', as: 'messages' });
+Message.belongsTo(User, { foreignKey: 'userId' });
+
+Room.belongsToMany(User, { through: UserRooms, foreignKey: 'roomId' });
+User.belongsToMany(Room, { through: UserRooms, foreignKey: 'userId' });
+
+UserRooms.belongsTo(User, { foreignKey: 'userId' });
+UserRooms.belongsTo(Room, { foreignKey: 'roomId' });
+
+const startApp = async () => {
+  try {
+    await sequelize.sync({ force: true });
+
+    const server = app.listen(PORT);
+
+    const wss = new WebSocketServer({ server });
+    const messageEmitter = new EventEmitter();
+
+    messageEmitter.on('message', (data) => {
+      if (data.roomId) {
+        for (const client of wss.clients) {
+          if (client.roomId === data.roomId) {
+            client.send(JSON.stringify(data));
+          }
+        }
+
+        return;
       }
-    }
+
+      for (const client of wss.clients) {
+        if (!client.roomId) {
+          client.send(JSON.stringify(data));
+        }
+      }
+    });
+
+    wss.on('connection', (client) => {
+      console.log('A new client connected');
+
+      client.on('message', (rawData) => {
+        const data = JSON.parse(rawData.toString());
+
+        if (data.type === 'JOIN_ROOM') {
+          client.roomId = data.roomId;
+        }
+      });
+    });
+  } catch (error) {
+    console.error(error);
   }
-});
+};
 
-wss.on('connection', (client) => {
-  // eslint-disable-next-line no-console
-  console.log('A new client connected');
-
-  client.roomId = null;
-
-  client.on('message', (data) => {
-    try {
-      const parsedData = JSON.parse(data.toString());
-
-      if (parsedData.type === 'JOIN_ROOM') {
-        client.roomId = parsedData.roomId;
-      }
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.log('Plain text message received');
-    }
-  });
-});
+startApp();
